@@ -9,11 +9,11 @@ from scipy.integrate import dblquad
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
 
-def exact_integral():
+def exact_integral(f):
     """
     Computes the exact integral for comparison using numerical integration.
     """
-    result, _ = dblquad(lambda x, y: x**2 + y**2, 0, 1, lambda y: 0, lambda y: 1)
+    result, _ = dblquad(f, 0, 1, lambda y: 0, lambda y: 1)
     return result
 
 def trapezoidal_2d(f, a, b, c, d, n, ax=None, plot_3d=False):
@@ -56,6 +56,7 @@ def trapezoidal_2d(f, a, b, c, d, n, ax=None, plot_3d=False):
         plt.close()
 
     return integral
+
 def plot_trapezoids(a, b, c, d, n, iter_num):
     """
     Plots the subdivided rectangles for the trapezoidal rule in 2D.
@@ -89,7 +90,7 @@ def romberg_2d(f, a, b, c, d, max_iter=5):
     Now includes 2D visualization of trapezoidal subdivisions.
     """
     R = np.zeros((max_iter, max_iter))
-    exact_value = exact_integral()
+    exact_value = exact_integral(f)
 
     print(f"Rétt gildi: {exact_value:.6f}")
     print("Ítrun     | Nálgun        | Skekkja")
@@ -114,11 +115,12 @@ def romberg_2d(f, a, b, c, d, max_iter=5):
     return R[max_iter-1, max_iter-1], R  # Return the final result and the Romberg table
 
 # Example usage
-def test_function(x, y):
-    return x**2 + y**2  # New test function  # New test function
-
 a, b = 0, 1
 c, d = 0, 1
+
+# Define function once and pass it as an argument
+test_function = lambda x, y: np.exp(-5 * ((x - 0.5)**2 + (y - 0.5)**2)) + \
+                             0.5 * np.exp(-10 * ((x - 0.2)**2 + (y - 0.8)**2))
 
 result, R_table = romberg_2d(test_function, a, b, c, d, max_iter=5)
 print(f"Loka niðurstaða Romberg Heildunar: {result}")

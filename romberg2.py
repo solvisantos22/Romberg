@@ -8,11 +8,11 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
 
-def exact_integral():
+def exact_integral(f):
     """
     Computes the exact integral for comparison using numerical integration.
     """
-    result, _ = dblquad(lambda x, y: x**2 + y**2, 0, 1, lambda y: 0, lambda y: 1)
+    result, _ = dblquad(f, 0, 1, lambda y: 0, lambda y: 1)
     return result
 
 def midpoint_triangle(f, tri):
@@ -114,7 +114,7 @@ def romberg_triangles(f, max_iter=5):
     R1 = np.zeros((max_iter, max_iter))
     R2 = np.zeros((max_iter, max_iter))
 
-    exact_value = exact_integral()
+    exact_value = exact_integral(f)
 
     print(f"Rétt gildi: {exact_value:.6f}")
     print("Ítrun     | Nálgun        | Skekkja")
@@ -129,7 +129,7 @@ def romberg_triangles(f, max_iter=5):
         R2[i, 0] = sum(midpoint_triangle(f, t)[0] for t in triangles2)
 
         plot_triangles(triangles1, triangles2, iter_num=i)
-        plot_3d_triangles(f, triangles1, triangles2, iter_num=i)  # New dynamic visualization
+        plot_3d_triangles(f, triangles1, triangles2, iter_num=i)
 
         triangles1 = [sub for t in triangles1 for sub in subdivide_triangle(t)]
         triangles2 = [sub for t in triangles2 for sub in subdivide_triangle(t)]
@@ -146,11 +146,12 @@ def romberg_triangles(f, max_iter=5):
 
     final_result = R1[max_iter-1, max_iter-1] + R2[max_iter-1, max_iter-1]
 
-    print("\nLoka niðurstaða Romberg Heildunar: (þríhyrninga): {:.6f}".format(final_result))
+    print("\nLoka niðurstaða Romberg Heildunar (þríhyrninga): {:.6f}".format(final_result))
     return final_result
 
-def test_function(x, y):
-    return x**2 + y**2
+# Define function once and pass it as an argument
+test_function = lambda x, y: np.exp(-5 * ((x - 0.5)**2 + (y - 0.5)**2)) + \
+                             0.5 * np.exp(-10 * ((x - 0.2)**2 + (y - 0.8)**2))
 
 # Execute the triangle-based Romberg integration with enhanced visualization
 romberg_triangles(test_function, max_iter=5)
