@@ -4,21 +4,19 @@ import os
 from scipy.integrate import dblquad
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
-# Ensure output directory exists
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
 
 def exact_integral(f):
     """
-    Computes the exact integral for comparison using numerical integration.
+    Reiknar nákvæmt heildi falls
     """
     result, _ = dblquad(f, 0, 1, lambda y: 0, lambda y: 1)
     return result
 
 def midpoint_triangle(f, tri):
     """
-    Approximates the integral over a triangle using the midpoint rule.
-    tri: List of three vertices [(x1, y1), (x2, y2), (x3, y3)]
+    Nálgar heildið yfir þríhyrning með því að nota miðpunktsreglu
     """
     x1, y1 = tri[0]
     x2, y2 = tri[1]
@@ -35,7 +33,7 @@ def midpoint_triangle(f, tri):
 
 def subdivide_triangle(tri):
     """
-    Subdivides a triangle into 4 smaller triangles.
+    Skiptir þríhyrningi í 4 minni
     """
     x1, y1 = tri[0]
     x2, y2 = tri[1]
@@ -56,7 +54,7 @@ def subdivide_triangle(tri):
 
 def plot_triangles(triangles1, triangles2, iter_num):
     """
-    Plots the subdivided triangles in 2D at each iteration.
+    Plottar í 2d
     """
     fig, ax = plt.subplots(figsize=(6, 6))
 
@@ -80,12 +78,11 @@ def plot_triangles(triangles1, triangles2, iter_num):
 
 def plot_3d_triangles(f, triangles1, triangles2, iter_num):
     """
-    Plots the function's surface dynamically, showing evolving triangular refinement.
+    Plottar fallið
     """
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection='3d')
 
-    # Iterate through all triangles and plot surfaces
     for color, triangles in zip(['blue', 'red'], [triangles1, triangles2]):
         for tri in triangles:
             x = [p[0] for p in tri] + [tri[0][0]]  # Close triangle loop
@@ -106,7 +103,7 @@ def plot_3d_triangles(f, triangles1, triangles2, iter_num):
 
 def romberg_triangles(f, max_iter=5):
     """
-    Performs Romberg Integration over a unit square split into two triangles.
+    Framkvæmir Romberg heildun yfir [0,1]x[0,1]
     """
     tri1 = [(0, 0), (1, 0), (0, 1)]
     tri2 = [(1, 0), (1, 1), (0, 1)]
@@ -119,8 +116,6 @@ def romberg_triangles(f, max_iter=5):
     print(f"Rétt gildi: {exact_value:.6f}")
     print("Ítrun     | Nálgun        | Skekkja")
     print("------------------------------------------")
-
-    # Start with the two initial triangles
     triangles1 = [tri1]
     triangles2 = [tri2]
 
@@ -148,10 +143,5 @@ def romberg_triangles(f, max_iter=5):
 
     print("\nLoka niðurstaða Romberg Heildunar (þríhyrninga): {:.6f}".format(final_result))
     return final_result
-
-# Define function once and pass it as an argument
-test_function = lambda x, y: np.exp(-5 * ((x - 0.5)**2 + (y - 0.5)**2)) + \
-                             0.5 * np.exp(-10 * ((x - 0.2)**2 + (y - 0.8)**2))
-
-# Execute the triangle-based Romberg integration with enhanced visualization
+test_function = lambda x, y: x**2+y**2
 romberg_triangles(test_function, max_iter=5)

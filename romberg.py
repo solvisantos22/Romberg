@@ -5,29 +5,26 @@ import matplotlib.patches as patches
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.integrate import dblquad
 
-# Ensure the output directory exists
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
 
 def exact_integral(f):
     """
-    Computes the exact integral for comparison using numerical integration.
+    Reiknar nákvæmt heildi
     """
     result, _ = dblquad(f, 0, 1, lambda y: 0, lambda y: 1)
     return result
 
 def trapezoidal_2d(f, a, b, c, d, n, ax=None, plot_3d=False):
     """
-    Compute the 2D Trapezoidal Rule approximation for the integral of f over [a,b] x [c,d].
-    Visualize the grid points and trapezoidal regions at each step if ax is provided.
-    n: Number of intervals (must be a power of 2 for Romberg)
+    Reiknar trapisu reglu nálgun fyrir heildi f yfir [a,b]x[c,d]. Plottar einnig.
+    n: fjöldi hlutbila, þarf að vera veldi af 2
     """
     x = np.linspace(a, b, n+1)
     y = np.linspace(c, d, n+1)
     hx = (b - a) / n
     hy = (d - c) / n
 
-    # Compute function values on the grid
     integral = 0
     grid_x, grid_y, grid_z = [], [], []
     for i in range(n+1):
@@ -43,7 +40,6 @@ def trapezoidal_2d(f, a, b, c, d, n, ax=None, plot_3d=False):
                 rect = patches.Rectangle((x[i], y[j]), hx, hy, linewidth=1, edgecolor='red', facecolor='none')
                 ax.add_patch(rect)
 
-    # 3D plot visualization
     if plot_3d:
         fig = plt.figure(figsize=(8, 6))
         ax3d = fig.add_subplot(111, projection='3d')
@@ -59,17 +55,16 @@ def trapezoidal_2d(f, a, b, c, d, n, ax=None, plot_3d=False):
 
 def plot_trapezoids(a, b, c, d, n, iter_num):
     """
-    Plots the subdivided rectangles for the trapezoidal rule in 2D.
+    Plottar fall í 2d
     """
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    # Compute grid points
+
     x = np.linspace(a, b, n+1)
     y = np.linspace(c, d, n+1)
     hx = (b - a) / n
     hy = (d - c) / n
 
-    # Draw rectangles in blue and red
     for i in range(n):
         for j in range(n):
             color = 'blue' if (i + j) % 2 == 0 else 'red'  # Alternate colors
@@ -86,8 +81,7 @@ def plot_trapezoids(a, b, c, d, n, iter_num):
 
 def romberg_2d(f, a, b, c, d, max_iter=5):
     """
-    Perform Romberg Integration in 2D using the trapezoidal rule.
-    Now includes 2D visualization of trapezoidal subdivisions.
+    Framkvæmir Romberg heildun í 2d með trapisureglu
     """
     R = np.zeros((max_iter, max_iter))
     exact_value = exact_integral(f)
@@ -97,30 +91,25 @@ def romberg_2d(f, a, b, c, d, max_iter=5):
     print("------------------------------------------")
 
     for i in range(max_iter):
-        n = 2**i  # Number of intervals along each dimension
+        n = 2**i
         R[i, 0] = trapezoidal_2d(f, a, b, c, d, n, plot_3d=True)
 
-        # Call the new 2D plot function
         plot_trapezoids(a, b, c, d, n, iter_num=i)
 
         error = abs(R[i, 0] - exact_value)
         print(f"{i+1:<9} | {R[i, 0]:<13.6f} | {error:.6e}")
 
-        # Romberg Extrapolation
         for j in range(1, i + 1):
             R[i, j] = (4**j * R[i, j-1] - R[i-1, j-1]) / (4**j - 1)
 
     plt.savefig(os.path.join(output_dir, 'romberg_trapezoids.png'))
     plt.close()
-    return R[max_iter-1, max_iter-1], R  # Return the final result and the Romberg table
+    return R[max_iter-1, max_iter-1], R
 
-# Example usage
 a, b = 0, 1
 c, d = 0, 1
 
-# Define function once and pass it as an argument
-test_function = lambda x, y: np.exp(-5 * ((x - 0.5)**2 + (y - 0.5)**2)) + \
-                             0.5 * np.exp(-10 * ((x - 0.2)**2 + (y - 0.8)**2))
+test_function = lambda x, y: np.sin(10*x) * np.cos(10*y) + np.exp(-5 * ((x-0.5)**2 + (y-0.5)**2)) + 0.5 * np.exp(-10 * ((x-0.2)**2 + (y-0.8)**2))
 
 result, R_table = romberg_2d(test_function, a, b, c, d, max_iter=5)
 print(f"Loka niðurstaða Romberg Heildunar: {result}")
