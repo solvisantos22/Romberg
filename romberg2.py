@@ -22,11 +22,9 @@ def midpoint_triangle(f, tri):
     x2, y2 = tri[1]
     x3, y3 = tri[2]
 
-    # Compute centroid
     xm = (x1 + x2 + x3) / 3
     ym = (y1 + y2 + y3) / 3
 
-    # Compute area of triangle
     area = 0.5 * abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1))
 
     return f(xm, ym) * area, (xm, ym)
@@ -39,12 +37,10 @@ def subdivide_triangle(tri):
     x2, y2 = tri[1]
     x3, y3 = tri[2]
 
-    # Compute midpoints
     m12 = ((x1 + x2) / 2, (y1 + y2) / 2)
     m23 = ((x2 + x3) / 2, (y2 + y3) / 2)
     m31 = ((x3 + x1) / 2, (y3 + y1) / 2)
 
-    # Return four new triangles
     return [
         [tri[0], m12, m31],
         [m12, tri[1], m23],
@@ -58,12 +54,10 @@ def plot_triangles(triangles1, triangles2, iter_num):
     """
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    # First set of triangles (blue)
     for tri in triangles1:
         polygon = plt.Polygon(tri, edgecolor='blue', fill=False, linewidth=1)
         ax.add_patch(polygon)
 
-    # Second set of triangles (red)
     for tri in triangles2:
         polygon = plt.Polygon(tri, edgecolor='red', fill=False, linewidth=1)
         ax.add_patch(polygon)
@@ -85,7 +79,7 @@ def plot_3d_triangles(f, triangles1, triangles2, iter_num):
 
     for color, triangles in zip(['blue', 'red'], [triangles1, triangles2]):
         for tri in triangles:
-            x = [p[0] for p in tri] + [tri[0][0]]  # Close triangle loop
+            x = [p[0] for p in tri] + [tri[0][0]]
             y = [p[1] for p in tri] + [tri[0][1]]
             z = [f(p[0], p[1]) for p in tri] + [f(tri[0][0], tri[0][1])]
 

@@ -67,7 +67,7 @@ def plot_trapezoids(a, b, c, d, n, iter_num):
 
     for i in range(n):
         for j in range(n):
-            color = 'blue' if (i + j) % 2 == 0 else 'red'  # Alternate colors
+            color = 'blue' if (i + j) % 2 == 0 else 'red'
             rect = plt.Rectangle((x[i], y[j]), hx, hy, edgecolor=color, fill=False, linewidth=1)
             ax.add_patch(rect)
 

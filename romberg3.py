@@ -115,7 +115,7 @@ plt.figure(figsize=(8,5))
 plt.bar(df_results["Fall"], df_results["Trapisu skekkja"], label="Trapisu skekkja", alpha=0.7)
 plt.bar(df_results["Fall"], df_results["Þríhyrnings skekkja"], label="Þríhyrnings skekkja", alpha=0.7)
 plt.xticks(rotation=45)
-plt.yscale("log")  # Nota log-skala til að sjá betur mismuninn
+plt.yscale("log")
 plt.ylabel("Skekkja")
 plt.legend()
 plt.title("Samanburður á skekkju")
