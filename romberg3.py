@@ -9,7 +9,7 @@ test_functions = {
     "Flókið sveiflukennt fall": lambda x, y: np.sin(10*x) * np.cos(10*y) + np.exp(-5 * (x**2 + y**2)),
     "Gaussískt fall": lambda x, y: np.exp(-10 * ((x - 0.3)**2 + (y - 0.7)**2)),
     "Margliðu–veldisvísis fall": lambda x, y: (x**3 + y**4) * np.exp(-x - y),
-    "Sveiflukennt ripple": lambda x, y: np.sin(5 * np.pi * x) * np.sin(5 * np.pi * y),
+    "Sveiflukennt gáru": lambda x, y: np.sin(5 * np.pi * x) * np.sin(5 * np.pi * y),
     "Samsett fall með háum sveiflum": lambda x, y: np.sin(10*x) * np.cos(10*y) + np.exp(-5 * ((x-0.5)**2 + (y-0.5)**2)) + 0.5 * np.exp(-10 * ((x-0.2)**2 + (y-0.8)**2)),
 }
 
@@ -21,12 +21,22 @@ def trapezoidal_2d(f, a, b, c, d, n):
     hx = (b - a) / n
     hy = (d - c) / n
 
-    integral = 0
-    for i in range(n):
-        for j in range(n):
-            integral += f(x[i], y[j]) * hx * hy
+    integral = 0.0
+    for i in range(n + 1):
+        for j in range(n + 1):
+            fxij = f(x[i], y[j])
 
-    return integral
+            # Determine weight
+            if (i == 0 or i == n) and (j == 0 or j == n):
+                weight = 1
+            elif (i == 0 or i == n) or (j == 0 or j == n):
+                weight = 2
+            else:
+                weight = 4
+
+            integral += weight * fxij
+
+    return (hx * hy / 4) * integral
 
 def romberg_trapezoidal_2d(f, a, b, c, d, max_iter=5):
     R = np.zeros((max_iter, max_iter))
@@ -112,8 +122,8 @@ print("\nSamanburður á Romberg Heildun\n")
 print(df_results.to_string(index=False))
 
 plt.figure(figsize=(8,5))
-plt.bar(df_results["Fall"], df_results["Trapisu skekkja"], label="Trapisu skekkja", alpha=0.7)
-plt.bar(df_results["Fall"], df_results["Þríhyrnings skekkja"], label="Þríhyrnings skekkja", alpha=0.7)
+plt.bar(df_results["Fall"], df_results["Trapisu skekkja"], label="Trapisu skekkja", alpha=0.7 , color="skyblue")
+plt.bar(df_results["Fall"], df_results["Þríhyrnings skekkja"], label="Þríhyrnings skekkja", alpha=0.7,  color="darkorange")
 plt.xticks(rotation=45)
 plt.yscale("log")
 plt.ylabel("Skekkja")
@@ -122,10 +132,10 @@ plt.title("Samanburður á skekkju")
 plt.show()
 
 plt.figure(figsize=(8,5))
-plt.bar(df_results["Fall"], df_results["Þríhyrnings keyrslutími"], label="Þríhyrnings keyrslutími", alpha=0.7)
-plt.bar(df_results["Fall"], df_results["Trapisu keyrslutími"], label="Trapisu keyrslutími", alpha=0.7)
+plt.bar(df_results["Fall"], df_results["Þríhyrnings keyrslutími"], label="Þríhyrnings keyrslutími", alpha=0.7,  color="darkorange")
+plt.bar(df_results["Fall"], df_results["Trapisu keyrslutími"], label="Trapisu keyrslutími", alpha=0.7, color="skyblue")
 plt.xticks(rotation=45)
 plt.ylabel("Tími (s)")
 plt.legend()
-plt.title("Samanburður á reiknitíma")
+plt.title("Samanburður á keyrslutíma")
 plt.show()

@@ -17,28 +17,37 @@ def exact_integral(f):
 
 def trapezoidal_2d(f, a, b, c, d, n, ax=None, plot_3d=False):
     """
-    Reiknar trapisu reglu nálgun fyrir heildi f yfir [a,b]x[c,d]. Plottar einnig.
-    n: fjöldi hlutbila, þarf að vera veldi af 2
+    Reiknar trapisu reglu nálgun fyrir heildi f yfir [a,b]x[c,d] með réttri vigtun.
     """
     x = np.linspace(a, b, n+1)
     y = np.linspace(c, d, n+1)
     hx = (b - a) / n
     hy = (d - c) / n
 
-    integral = 0
+    integral = 0.0
     grid_x, grid_y, grid_z = [], [], []
-    for i in range(n+1):
-        for j in range(n+1):
-            value = f(x[i], y[j])
-            integral += value * hx * hy
+
+    for i in range(n + 1):
+        for j in range(n + 1):
+            fxij = f(x[i], y[j])
+
+            if (i == 0 or i == n) and (j == 0 or j == n):
+                weight = 1
+            elif (i == 0 or i == n) or (j == 0 or j == n):
+                weight = 2
+            else:
+                weight = 4
+
+            integral += weight * fxij
             grid_x.append(x[i])
             grid_y.append(y[j])
-            grid_z.append(value)
+            grid_z.append(fxij)
 
-            # Plot trapezoidal regions if axis is provided
             if ax is not None:
                 rect = patches.Rectangle((x[i], y[j]), hx, hy, linewidth=1, edgecolor='red', facecolor='none')
                 ax.add_patch(rect)
+
+    integral *= (hx * hy) / 4.0
 
     if plot_3d:
         fig = plt.figure(figsize=(8, 6))
@@ -109,7 +118,7 @@ def romberg_2d(f, a, b, c, d, max_iter=5):
 a, b = 0, 1
 c, d = 0, 1
 
-test_function = lambda x, y: np.sin(10*x) * np.cos(10*y) + np.exp(-5 * ((x-0.5)**2 + (y-0.5)**2)) + 0.5 * np.exp(-10 * ((x-0.2)**2 + (y-0.8)**2))
+test_function = lambda x, y: x**2 + y**2
 
 result, R_table = romberg_2d(test_function, a, b, c, d, max_iter=5)
 print(f"Loka niðurstaða Romberg Heildunar: {result}")
